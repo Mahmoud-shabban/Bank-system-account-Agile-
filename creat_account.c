@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+long ACCID;
 /*********** ***************** *********/
 /*********** Bank system ***** *********/
 /*********** ***************** *********/
@@ -12,8 +13,6 @@
 /*  Date        : 6/5/2022                    */
 /*  Version     : 0.1                         */
 /*********** ***************** ****************/
-
-
 
 
 /* Preprocessing part */
@@ -88,44 +87,65 @@ Data * new_account(List * db);
 // client age
 int get_age();
 // account balance
-long get_account_balance(); 
+long get_account_balance();
+// Deposit Function
+void Deposit(int chr, List *pl);
+// Open Existing Account
+int OpenExistingAccount(List *pl);
+// Change Status
+void ChangeStatus(List *pl);
 
-
-void main()
+    int main()
 {
     List DataBase;
     int status;
     int operation;
+    int chr;
+    int func; 
+
     status = 1;
-    // intializing the list
+
+    // 1- Open Existing Account Main Interface Menu
     List_Init(&DataBase);
-    printf("Welcome to your Bank system\n");
+    printf("Welcome to The Bank Management System! \n");
     printf("How can we help you?\n");
     getchar();
+
     while(status != 0)
     {
         system("clear");
-        printf("please entre your choice as number\n");
-        printf("1- create new account  2- exit  ");
+        printf("\n\nplease entre your choice as number\n");
+        printf("1-Create new account 2-Open Existin Account 3-Exit  ");
         scanf("%d",&operation);
         system("clear");
-        // printf("\n");system("clear");
-        if (operation == 2){ status = 0;}
-        if (operation == 1){
+        
+        if (operation == 3){ status = 0;}
+        if (operation == 1)
+        {
             printf("it works until here");
             getchar();
-            List_Void_Append(&DataBase,new_account(&DataBase));
+            List_Void_Append(&DataBase, new_account(&DataBase));
         }
-        
+        if (operation == 2)
+        {
+            func = OpenExistingAccount(&DataBase);
+            getchar();
+            if (func == 4)
+            {
+                Deposit(chr, &DataBase);
+            }
+            if (func == 3)
+            {
+                ChangeStatus(&DataBase);
+            }
+        }
 
     }
     system("clear");
     // printf("\n(Success) your account is created \n");
-    
     // printf("your Account ID is: %09ld \n", get_last_client(&DataBase)->data->BankAccountID );
     print_Void_List(&DataBase);
 }
-
 
 /************* Function Declaration Section***********/
 
@@ -520,3 +540,81 @@ Node * get_last_client(List * list)
     vistor = NULL;
     return last_client;
 }
+
+
+
+
+
+
+
+// Open Existing Account
+int OpenExistingAccount(List *pl)
+{
+    // BankAccount ExistingAccount;
+    int choose;
+    long AccId;
+    Node* tempPointer = pl->Head;
+    printf("Please enter your bank account id: ");
+    scanf("%li", &AccId);
+    ACCID = AccId;
+
+    while (AccId != pl->Head->data->BankAccountID)
+    {
+        tempPointer = tempPointer->Next;
+    }
+    if (AccId == tempPointer->data->BankAccountID)
+    {
+        printf("Account Exists ! \n");
+        printf("Choose the function you want to perform:");
+        printf("\n 1- Make Transaction");
+        printf("\n 2- Get Cash");
+        printf("\n 3- Change Status");
+        printf("\n 4- Deposit in Account");
+        printf("\n 5- Return to main menu");
+        scanf("\n%d", &choose);
+        return choose;
+    }
+    else{
+        printf("Account Does not Exist ! \n");
+        return 9;
+    }
+}
+
+// 5- Deposit Function
+void Deposit(int chr, List *pl)
+{
+    long amount;
+    Node *tempPointer = pl->Head;
+    while (ACCID != pl->Head->data->BankAccountID)
+    {
+        tempPointer = tempPointer->Next;
+    }
+    if (ACCID == tempPointer->data->BankAccountID)
+    {
+        printf("\nEnter Amount you want to add: ");
+        scanf("%li", &amount);
+        printf("\nAmount To add is: %li\n", amount);
+        tempPointer->data->Balance = tempPointer->data->Balance + amount;
+        printf("\nBalance for the account is Updated: %li\n", tempPointer->data->Balance);
+    }
+}
+
+void ChangeStatus(List *pl)
+{
+    Node *tempPointer = pl->Head;
+    while (ACCID != pl->Head->data->BankAccountID)
+    {
+        tempPointer = tempPointer->Next;
+    }
+    if (ACCID == tempPointer->data->BankAccountID){
+        if (strcmp(tempPointer->data->AccountStatus, "Active") == 0){
+            tempPointer->data->AccountStatus = "Deactive";
+        }
+        else{
+            tempPointer->data->AccountStatus = "Active";
+        }
+        printf("\nAccount Status Changed!\n");
+    }
+}
+
+// 000000001
