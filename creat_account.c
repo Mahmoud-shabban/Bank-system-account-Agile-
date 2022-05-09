@@ -85,36 +85,42 @@ long get_national_id();
 char*  get_address();
 // new account
 Data * new_account(List * db);
+// client age
 int get_age();
+// account balance
+long get_account_balance(); 
+
 
 void main()
 {
     List DataBase;
     int status;
-    int order;
-// intializing the list
+    int operation;
     status = 1;
+    // intializing the list
     List_Init(&DataBase);
     printf("Welcome to your Bank system\n");
     printf("How can we help you?\n");
     getchar();
-    while(status == 1)
+    while(status != 0)
     {
         system("clear");
         printf("please entre your choice as number\n");
         printf("1- create new account  2- exit  ");
-        scanf("%d",&order);
+        scanf("%d",&operation);
         system("clear");
         // printf("\n");system("clear");
-        if (order == 2){break;}
-        if (order == 1){
+        if (operation == 2){ status = 0;}
+        if (operation == 1){
+            printf("it works until here");
+            getchar();
             List_Void_Append(&DataBase,new_account(&DataBase));
         }
-
+        
 
     }
     system("clear");
-    printf("\n(Success) your account is created \n");
+    // printf("\n(Success) your account is created \n");
     
     // printf("your Account ID is: %09ld \n", get_last_client(&DataBase)->data->BankAccountID );
     print_Void_List(&DataBase);
@@ -124,9 +130,9 @@ void main()
 /************* Function Declaration Section***********/
 
 Data * new_account(List * db){
-    Node * last_client;
+    Node * last_client = NULL; // to get the last client account id and create the next
     int g;
-    Data * new;
+    Data * new = NULL;
     new =(Data *) malloc(sizeof(Data));
     if (List_int_is_Empty(db)){
         last_client = NULL;
@@ -134,31 +140,35 @@ Data * new_account(List * db){
         last_client = get_last_client(db);
     }
     (*new).ClientFullNmae = get_name(0);
-    printf("\n");
     (*new).Age = get_age();
     (*new).BankAccountID = gen_account_id(last_client);
-    printf("Account Id Generated\n");
-    printf("\n");
     (*new).NationalID = get_national_id(0);
     (*new).AccountStatus = "Active";
-    printf("Enter Account Balance: ");
-    scanf("%ld", &(*new).Balance);
+    (*new).Balance = get_account_balance();
     printf("Does client have Gurdian (enter 1 for yes, 0 for no: ");
     scanf("%d",&g);
-    printf("\n");
     if ( g == 0){
         (*new).GurdianID = 0;
         (*new).GurdianName = "None";
-    }else{
-        
+    }else if (g == 1)
+    {
         (*new).GurdianName = get_name(1);
         (*new).GurdianID = get_national_id(1);
     }
+    getchar();
     (*new).ClientAddress = get_address();
-    (*new).Password = (*new).NationalID;
+    (*new).Password = (*new).NationalID; // we use the national id as password
+    printf("\n(Success) your account is created \n");
+    getchar();
     return new;
 }
 
+long get_account_balance(){
+    long b;
+    printf("Enter Account Balance: ");
+    scanf("%ld", &b);
+    return b;
+}
 
 char*  get_address(){
     char address [30];
@@ -182,8 +192,7 @@ long get_national_id(int t){
     }else{
     printf("Enter Gurdian National ID: ");
     }
-    scanf("%ld",&id);
-    printf("\n");
+    scanf("%14ld",&id);
     return id;
 }
 
@@ -194,6 +203,8 @@ long gen_account_id(Node * n){
     }else{ last_id = 0;}
 
     // static long id = 0;
+    printf("Account Id Generated");
+    printf("\n");
     return ++last_id;
 }
 
@@ -201,6 +212,9 @@ char*  get_name(int t){
     char name [30];
     getchar();
     if(t == 0){
+        printf("Please Entre client name: ");
+    } else if (t == 1)
+    {
         printf("Please Entre client name: ");
     }
     
@@ -215,7 +229,7 @@ int get_age(){
     int age;
     printf("Enter client age: ");
     scanf("%d",&age);
-    printf("\n");
+    // printf("\n");
     return age;
 }
 
@@ -485,19 +499,22 @@ void clear_Void_List(List * pl)
 
 Node * get_last_client(List * list)
 {
-    Node * last_client;
+    Node * last_client = NULL;
     // last_client = list->Tail->data;
     // setting the tail at the list start point
     Node * vistor;
     vistor = list->Head;
     // make the vistor move on each node from heat to tail
-    while(vistor->Next->Next != NULL)
+    if (list->Head == NULL){
+        return last_client;
+    }
+    while(vistor->Next != NULL)
     {
         // when the visotr is not at the one before the last.
        vistor = vistor->Next;
     }
     // now we now we at the node befor the last so we move only one step
-    vistor->Next;
+    // vistor->Next;
     // catching the last client data
     last_client = vistor;
     vistor = NULL;
