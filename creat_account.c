@@ -94,8 +94,10 @@ void Deposit(int chr, List *pl);
 int OpenExistingAccount(List *pl);
 // Change Status
 void ChangeStatus(List *pl);
+// Make Transaction
+void Transaction(List *pl);
 
-    int main()
+int main()
 {
     List DataBase;
     int status;
@@ -130,13 +132,16 @@ void ChangeStatus(List *pl);
         {
             func = OpenExistingAccount(&DataBase);
             getchar();
-            if (func == 4)
+            switch (func)
             {
-                Deposit(chr, &DataBase);
-            }
-            if (func == 3)
-            {
+            case 1:
+                Transaction(&DataBase);
+            case 3:
                 ChangeStatus(&DataBase);
+                break;
+            case 4:
+                Deposit(chr, &DataBase);
+                break;
             }
         }
 
@@ -541,12 +546,6 @@ Node * get_last_client(List * list)
     return last_client;
 }
 
-
-
-
-
-
-
 // Open Existing Account
 int OpenExistingAccount(List *pl)
 {
@@ -558,7 +557,7 @@ int OpenExistingAccount(List *pl)
     scanf("%li", &AccId);
     ACCID = AccId;
 
-    while (AccId != pl->Head->data->BankAccountID)
+    while (AccId != tempPointer->data->BankAccountID)
     {
         tempPointer = tempPointer->Next;
     }
@@ -570,7 +569,7 @@ int OpenExistingAccount(List *pl)
         printf("\n 2- Get Cash");
         printf("\n 3- Change Status");
         printf("\n 4- Deposit in Account");
-        printf("\n 5- Return to main menu");
+        printf("\n 5- Return to main menu\n");
         scanf("\n%d", &choose);
         return choose;
     }
@@ -585,7 +584,7 @@ void Deposit(int chr, List *pl)
 {
     long amount;
     Node *tempPointer = pl->Head;
-    while (ACCID != pl->Head->data->BankAccountID)
+    while (ACCID != tempPointer->data->BankAccountID)
     {
         tempPointer = tempPointer->Next;
     }
@@ -602,7 +601,7 @@ void Deposit(int chr, List *pl)
 void ChangeStatus(List *pl)
 {
     Node *tempPointer = pl->Head;
-    while (ACCID != pl->Head->data->BankAccountID)
+    while (ACCID != tempPointer->data->BankAccountID)
     {
         tempPointer = tempPointer->Next;
     }
@@ -615,6 +614,45 @@ void ChangeStatus(List *pl)
         }
         printf("\nAccount Status Changed!\n");
     }
+}
+void Transaction(List *pl)
+{
+    // Enter Bank Acc Id to transfer to
+    long AccTransferTo;
+    long Money;
+
+    Node *tempPointer = pl->Head;
+    Node *tempPointerMe = pl->Head;
+
+    printf("Please enter bank account id to transfer to: ");
+    scanf("%li", &AccTransferTo);
+
+    while (AccTransferTo != tempPointer->data->BankAccountID)
+    {
+        tempPointer = tempPointer->Next;
+    }
+    while (ACCID != tempPointerMe->data->BankAccountID)
+    {
+        tempPointerMe = tempPointerMe->Next;
+    }
+    if (AccTransferTo == tempPointer->data->BankAccountID)
+    {
+        // Enter amount of money to transfer to this acc.
+        printf("What is the amount of money to transfer ? \n");
+        scanf("%li", &Money);
+        
+        // Make sure amount money is less than clinet balance balance.
+        if (Money < tempPointer->data->Balance)
+        {
+            tempPointer->data->Balance = tempPointer->data->Balance + Money;
+            tempPointerMe->data->Balance = tempPointerMe->data->Balance - Money;
+        }
+        else
+        {
+            printf("Can't Make Transaction ! \n");
+        }
+    }
+    // Reciver
 }
 
 // 000000001
